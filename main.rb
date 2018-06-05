@@ -4,7 +4,7 @@ require 'nokogiri'
 class BookPriceChecker
 
   def initialize
-    @url = "https://www.amazon.co.uk/dp/B01MSLFA03/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1"
+    @url = read_url
   end
   
   def get_body
@@ -20,7 +20,12 @@ class BookPriceChecker
 
   #compare_price with stored price
 
-  private
+
+  def read_url
+    file = File.readlines('urls.txt').first.strip
+  end 
+
+  private 
 
   def scrape_for_price(html)
     match = /£(\d\.\d+)/.match(html.at_css('tr.kindle-price td.a-color-price').text)
@@ -29,5 +34,7 @@ class BookPriceChecker
 end
 
 book_price_checker = BookPriceChecker.new
+
+puts book_price_checker.read_url
 
 puts book_price_checker.get_price
