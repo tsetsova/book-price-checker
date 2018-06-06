@@ -4,37 +4,44 @@ require 'nokogiri'
 class BookPriceChecker
 
   def initialize
-    @url = get_url
-    @book_title = get_title
-    @current_price = get_price
+    @book_details = populate_book_details
     @desired_price = 1.99
   end
-  
-  def get_response_body
-    Faraday.get(@url).body
-  end
-
-  def get_price
-    scrape_for_price(Nokogiri::HTML(get_response_body)).to_f
-  end
-
-  def get_title
-    scrape_for_title(Nokogiri::HTML(get_response_body))
-  end
  
-  def cheap_enough?
-    if (@current_price <= @desired_price)
-      puts "Yay! #{@book_title} is currently #{@current_price}"
+  def get_price(response_body)
+    scrape_for_price(Nokogiri::HTML(response_body)).to_f
+  end
+
+  def get_title(response_body)
+    scrape_for_title(Nokogiri::HTML(response_body))
+  end
+
+  def get_book_details
+    puts @book_details
+  end 
+ 
+  def check_book_cheapness
+    @book_details.each do |title, current_price| 
+      cheap_enough?(title, current_price)
+    end
+  end
+
+  def cheap_enough?(title, current_price)
+    if (current_price <= @desired_price)
+      puts "Yay! #{title} is only #{current_price}!!"
     else
-      puts "\"#{@book_title}\" is not cheap enough"
+      puts ":( ... \"#{title}\" is not cheap enough"
     end 
   end
 
   private
 
-  def get_url
-    File.readlines('urls.txt').first.strip
-  end 
+  def populate_book_details
+    urls = [] 
+    File.foreach('urls.txt'){ |url| urls << url.strip}
+    bodies = urls.map {|url| Faraday.get(url).body}
+    Hash[ *bodies.collect{ |body| [get_title(body), get_price(body)] }.flatten ] 
+  end
 
   def scrape_for_title(html) 
     match = html.at_css('span#ebooksProductTitle').text
@@ -45,9 +52,3 @@ class BookPriceChecker
     match[1]
   end
 end
-
-book_price_checker = BookPriceChecker.new
-
-puts book_price_checker.get_price
-
-puts book_price_checker.cheap_enough?
