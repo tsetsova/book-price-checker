@@ -3,15 +3,28 @@ require 'nokogiri'
 
 class BookPriceChecker
 
+  attr_reader :book_details
+
   def initialize(file_name)
     @file_name = file_name
     @book_details = {}
-    @desired_price = 1.99
   end
  
-  def watch(url)
-    add_to_url_list(url)
+  def watch(url, desired_price)
+    add_book(url, desired_price)
   end
+
+  def check_book_cheapness
+    @book_details.each do |title, current_price| 
+      book_cheapness(title, current_price)
+    end
+  end
+
+  def cheap_enough?(title)
+    @book_details[title][:current_price] <= @book_details[title][:desired_price]
+  end 
+
+  private
 
   def get_title(response_body)
     scrape_for_title(Nokogiri::HTML(response_body))
@@ -21,36 +34,8 @@ class BookPriceChecker
     scrape_for_price(Nokogiri::HTML(response_body)).to_f
   end
 
-  def list_urls
-    urls = []
-    File.foreach(@file_name){ |url| urls << url.strip}
-    urls
-  end
-
-  def get_book_details
-    populate_book_details
-  end 
- 
-  def check_book_cheapness
-    @book_details.each do |title, current_price| 
-      cheap_enough?(title, current_price)
-    end
-  end
-
-  private
-
-  def populate_book_details
-    urls = list_urls
-    bodies = urls.map {|url| Faraday.get(url).body}
-    Hash[ *bodies.collect{ |body| [get_title(body), get_price(body)] }.flatten ] 
-  end
-
-  def add_to_url_list(url)
-    File.open(@file_name, 'a') { |file| file.write(url + "\n")}
-  end
-
   def scrape_for_title(html) 
-    match = html.at_css('span#ebooksProductTitle').text
+     match = html.at_css('span#ebooksProductTitle').text
   end
 
   def scrape_for_price(html)
@@ -58,8 +43,17 @@ class BookPriceChecker
     match[1]
   end
 
-  def cheap_enough?(title, current_price)
-    if (current_price <= @desired_price)
+  def add_book(url, desired_price)
+    response_body = Faraday.get(url).body
+    title = get_title(response_body) 
+    current_price = get_price(response_body)
+    @book_details.store(title, { :desired_price => desired_price, 
+                                  :current_price => current_price, 
+                                  :url           => url}) 
+  end
+
+  def book_cheapness(title, current_price)
+    if cheap_enough?(title)
       puts "Yay! #{title} is only #{current_price}!!"
     else
       puts ":( ... #{title} is not cheap enough"
