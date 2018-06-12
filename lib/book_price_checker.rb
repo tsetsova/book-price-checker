@@ -4,7 +4,6 @@ require_relative 'book'
 class BookPriceChecker
   def initialize(file_name)
     @file_name = file_name
-    # file name is currently not used
     @books = []
   end
 
@@ -24,10 +23,15 @@ class BookPriceChecker
     Hash[*@books.collect { |b| [b.title, { cheap?: b.cheap_enough? }] }.flatten]
   end
 
+  def cli_status
+    File.readlines(@file_name).first.strip
+  end
+
   private
 
   def add_book(book)
     book.scrape_details
     @books << book
+    File.open(@file_name, 'a') { |file| file.write(status) }
   end
 end
