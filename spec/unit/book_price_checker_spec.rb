@@ -7,7 +7,7 @@ describe BookPriceChecker do
     FileUtils.touch('test.txt')
   end
 
-  after(:all) {FileUtils.rm 'test.txt', force: true}
+  after(:all) { FileUtils.rm 'test.txt', force: true }
 
   let(:book_price_checker) { described_class.new('test.txt') }
 
