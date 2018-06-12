@@ -4,6 +4,7 @@ ruby '~> 2.4.0'
 
 gem 'faraday'
 gem 'nokogiri'
+gem 'rake'
 
 group :development do
   gem 'rubocop', '~> 0.57.0'
