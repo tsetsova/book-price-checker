@@ -1,5 +1,6 @@
 AllCops:
   Exclude:
     - 'spec/spec_helper.rb'
+    - 'lib/main.rb'
 Style/FrozenStringLiteralComment:
   Enabled: false
