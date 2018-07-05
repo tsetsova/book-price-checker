@@ -34,12 +34,5 @@ class BookPriceChecker
     book.scrape_details
     @books << book
     File.open(@file_name, 'a') { |file| file.write(status) }
-    update_saved_details
-  end
-
-  def update_saved_details
-    File.open(@file_name, 'a') do |f|
-      f.write(status.to_json)
-    end
   end
 end
