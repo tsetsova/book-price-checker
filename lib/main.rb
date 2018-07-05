@@ -1,4 +1,5 @@
 require 'optparse'
+require 'json'
 require_relative 'book_price_checker'
 
 options = {}
@@ -23,7 +24,7 @@ OptionParser.new do |parser|
   end
 end.parse!
 
-book_price_watcher = BookPriceChecker.new('book_details.txt')
+book_price_watcher = BookPriceChecker.new('price_checker_status.json')
 
 if (options[:url] && options[:price])
   book_price_watcher.watch(options[:url], options[:price])
@@ -31,7 +32,7 @@ if (options[:url] && options[:price])
   puts "The current price is #{book_price_watcher.current_price(options[:url])}"
   puts "The desired price has been set to #{ options[:price]}"
 elsif (options[:list])
-  puts "#{book_price_watcher.cli_status}"
+  puts book_price_watcher.cli_status 
 else 
   puts "Please add a url AND a desired price. Use -h or --help for more information."
 end

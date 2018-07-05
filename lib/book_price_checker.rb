@@ -1,4 +1,5 @@
 require_relative 'book'
+require 'json'
 
 # Checks Amazon book prices against a user specified price
 class BookPriceChecker
@@ -24,7 +25,11 @@ class BookPriceChecker
   end
 
   def cli_status
+<<<<<<< HEAD
     File.readlines(@file_name).first.strip
+=======
+    JSON.parse(File.readlines(@file_name).first.strip)
+>>>>>>> feat(track-one-title): Store data in json format
   end
 
   private
@@ -32,6 +37,16 @@ class BookPriceChecker
   def add_book(book)
     book.scrape_details
     @books << book
+<<<<<<< HEAD
     File.open(@file_name, 'a') { |file| file.write(status) }
+=======
+    update_saved_details
+  end
+
+  def update_saved_details
+    File.open(@file_name, 'a') do |f|
+      f.write(status.to_json)
+    end
+>>>>>>> feat(track-one-title): Store data in json format
   end
 end
