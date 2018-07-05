@@ -20,6 +20,11 @@ class BookPriceChecker
     add_book(Book.new(url, desired_price))
   end
 
+  def unwatch (title)
+    @books.delete_if{ |book| book.title == title}
+    write_to_file
+  end
+
   def status
     Hash[*@books.collect { |b| [b.title, { cheap?: b.cheap_enough? }] }.flatten]
   end
@@ -33,6 +38,10 @@ class BookPriceChecker
   def add_book(book)
     book.scrape_details
     @books << book
+    write_to_file
+  end
+
+  def write_to_file
     File.open(@file_name, 'a') { |file| file.write(status.to_json) }
   end
 end

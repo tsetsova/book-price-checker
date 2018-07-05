@@ -32,4 +32,14 @@ describe BookPriceChecker do
                  'Brand New Friend' => { cheap?: true } }
     expect(book_price_checker.status).to eq expected
   end
+
+  it '#watch' do
+    url1 = 'https://www.amazon.co.uk/dp/B01MSLFA03/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1'
+    url2 = 'https://www.amazon.co.uk/dp/B07D8YXWBY/ref=sspa_dk_detail_3?psc=1'
+    book_price_checker.watch(url1, 1.99)
+    book_price_checker.watch(url2, 5.00)
+    book_price_checker.unwatch('The Last Tudor')
+    expected = { 'Brand New Friend' => { cheap?: true } }
+    expect(book_price_checker.status).to eq expected
+  end
 end
