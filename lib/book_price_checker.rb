@@ -33,6 +33,6 @@ class BookPriceChecker
   def add_book(book)
     book.scrape_details
     @books << book
-    File.open(@file_name, 'a') { |file| file.write(status) }
+    File.open(@file_name, 'a') { |file| file.write(status.to_json) }
   end
 end
