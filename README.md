@@ -1,13 +1,13 @@
 [![Build Status](https://travis-ci.org/tsetsova/book-price-checker.svg?branch=master)](https://travis-ci.org/tsetsova/book-price-checker/)
 [![Code Climate](https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg)](https://codeclimate.com/github/tsetsova/book-price-checker)
 
-#Book Price Checker
+# Book Price Checker
 
 A simple ruby app that helps you track the prices of kindle books. 
 
-##Installation
+## Installation
 
-###Prerequisites
+### Prerequisites
 
 * ruby 2.5.1
 
@@ -19,11 +19,11 @@ To install the remaining dependencies run:
 bundle install
 ```
 
-###Use
+### Use
 
 To start the app run
 ```
-ruby lib/main.rb 'book_title' 'desired_price'
+ruby lib/main.rb -u 'book_url' -p 'desired_price'
 ```
 
 To list currently watched titles run
