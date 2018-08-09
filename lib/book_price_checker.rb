@@ -1,11 +1,13 @@
 require_relative 'book'
+require_relative '../db'
 require 'json'
 
 # Checks Amazon book prices against a user specified price
 class BookPriceChecker
-  def initialize(file_name)
+  def initialize(file_name, database = Database.new)
     @file_name = file_name
     @books = []
+    @db = database
   end
 
   def title(url)
@@ -20,28 +22,29 @@ class BookPriceChecker
     add_book(Book.new(url, desired_price))
   end
 
-  def unwatch (title)
-    @books.delete_if{ |book| book.title == title}
-    write_to_file
+  def unwatch(title)
+    remove_book(title)
   end
 
-  def status
-    Hash[*@books.collect { |b| [b.title, { cheap?: b.cheap_enough? }] }.flatten]
-  end
-
-  def cli_status
-    JSON.parse(File.readlines(@file_name).first.strip)
+  def watched_books
+    { books: @books.map { |book| { title: book.title, cheap?: book.cheap_enough? } } }
   end
 
   private
 
   def add_book(book)
     book.scrape_details
-    @books << book
-    write_to_file
+    @db.insert(book)
+    load_books
   end
 
-  def write_to_file
-    File.open(@file_name, 'a') { |file| file.write(status.to_json) }
+  def remove_book(title)
+    @db.delete_title(title)
+    load_books
+  end
+
+  def load_books
+    @books = @db.books
+    File.open(@file_name, 'w') { |file| file.write(watched_books.to_json) }
   end
 end
