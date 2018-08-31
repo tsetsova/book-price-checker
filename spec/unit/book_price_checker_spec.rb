@@ -58,9 +58,13 @@ describe BookPriceChecker do
       book_price_checker.watch(url2, 5.00)
       book_price_checker.watch(url1, 1.99)
       expected = { books: [{ title: 'Brand New Friend',
-                             cheap?: true },
+                             cheap?: true,
+                             price: 2.99,
+                             desired_price: 5.0 },
                            { title: 'The Last Tudor',
-                             cheap?: false }] }
+                             cheap?: false,
+                             price: 3.99,
+                             desired_price: 1.99 }] }
       expect(book_price_checker.watched_books).to eq expected
     end
   end

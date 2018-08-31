@@ -22,7 +22,7 @@ class BookPriceChecker
   end
 
   def watched_books
-    { books: load_books.map { |book| { title: book.title, cheap?: book.cheap_enough? } } }
+    Hash[:books, load_books.map(&:to_map)]
   end
 
   private

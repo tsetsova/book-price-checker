@@ -10,15 +10,14 @@ describe Book do
 
   it '#get_book_details' do
     VCR.use_cassette('amazon_webpage_1') do
-      url1 = 'https://www.amazon.co.uk/dp/B01MSLFA03/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1'
-      book = Book.new(url1, 1.99)
+      url = 'https://www.amazon.co.uk/dp/B01MSLFA03/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1'
+      book = Book.new(url, 1.99)
+      book.scrape_details
 
-      expected = { title: 'The Last Tudor',
-                   current_price: 3.99,
-                   desired_price: 1.99,
-                   url:           url1 }
-
-      expect(book.details).to eq expected
+      expect(book.title).to eq "The Last Tudor"
+      expect(book.current_price).to eq(3.99)
+      expect(book.desired_price).to eq(1.99)
+      expect(book.url).to eq(url)
     end
   end
 
@@ -26,6 +25,8 @@ describe Book do
     VCR.use_cassette('amazon_webpage_1') do
       url1 = 'https://www.amazon.co.uk/dp/B01MSLFA03/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1'
       book = Book.new(url1, 1.99)
+      book.scrape_details
+
       expect(book.cheap_enough?). to eq false
     end
   end

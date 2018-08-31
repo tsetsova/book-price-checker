@@ -10,7 +10,6 @@ class Book
     @current_price = 0
     @desired_price = desired_price
     @url = url
-    @book_details = {}
   end
 
   def self.from_db(_id, title, current_price, desired_price, url)
@@ -21,24 +20,23 @@ class Book
     book
   end
 
-  def details
-    scrape_details
-    @book_details
-  end
-
   def scrape_details
     response_body = Faraday.get(@url).body
     @title = scrape_for_title(response_body)
     @current_price = scrape_for_price(response_body)
-    @book_details = { title: @title,
-                      current_price: @current_price,
-                      desired_price: @desired_price,
-                      url: @url }
   end
 
   def cheap_enough?
-    scrape_details
-    @book_details[:current_price] <= @book_details[:desired_price]
+    @current_price <= @desired_price
+  end
+
+  def to_map
+    {
+      title: title, 
+      cheap?: cheap_enough?,
+      price: current_price,
+      desired_price: desired_price
+    }
   end
 
   protected
