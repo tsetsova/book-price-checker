@@ -49,6 +49,6 @@ class Book
   def scrape_for_price(response_body)
     selector = 'tr.kindle-price td.a-color-price'
     html = Nokogiri::HTML(response_body)
-    /£(\d\.\d+)/.match(html.at_css(selector).text)[1].to_f
+    /£(\d+\.\d+)/.match(html.at_css(selector).children[0].to_xml(encoding: "UTF-8").strip)[1].to_f
   end
 end
