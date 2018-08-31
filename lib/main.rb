@@ -1,6 +1,7 @@
 require 'optparse'
 require 'json'
 require_relative 'book_price_checker'
+require_relative '../db'
 
 options = {}
 
@@ -24,15 +25,25 @@ OptionParser.new do |parser|
   end
 end.parse!
 
-book_price_watcher = BookPriceChecker.new('price_checker_status.json')
-
 if (options[:url] && options[:price])
-  book_price_watcher.watch(options[:url], options[:price])
-  puts "#{ book_price_watcher.title(options[:url]) } has been added."
-  puts "The current price is #{book_price_watcher.current_price(options[:url])}"
-  puts "The desired price has been set to #{ options[:price]}"
+  begin
+    db = Database.new
+    db.setup
+    book_price_watcher = BookPriceChecker.new(db)
+
+    book_price_watcher.watch(options[:url], options[:price])
+    puts "#{ book_price_watcher.title(options[:url]) } has been added."
+    puts "The current price is #{book_price_watcher.current_price(options[:url])}"
+    puts "The desired price has been set to #{ options[:price]}"
+  ensure
+    db.close
+  end
 elsif (options[:list])
-  puts JSON.parse(File.readlines('price_checker_status.json').first.strip) 
-else 
+  db = Database.new
+  db.setup
+  book_price_watcher = BookPriceChecker.new(db)
+
+  puts book_price_watcher.watched_books.to_json
+else
   puts "Please add a url AND a desired price. Use -h or --help for more information."
 end

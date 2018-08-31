@@ -2,4 +2,4 @@
 *.json
 *.db
 fixtures/
-:memory
+coverage/
