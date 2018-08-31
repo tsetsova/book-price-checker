@@ -30,6 +30,7 @@ class BookPriceChecker
   def add_book(book)
     book.scrape_details
     @db.insert(book)
+    book
   end
 
   def remove_book(title)

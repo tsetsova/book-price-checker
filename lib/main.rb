@@ -31,9 +31,9 @@ if (options[:url] && options[:price])
     db.setup
     book_price_watcher = BookPriceChecker.new(db)
 
-    book_price_watcher.watch(options[:url], options[:price])
-    puts "#{ book_price_watcher.title(options[:url]) } has been added."
-    puts "The current price is #{book_price_watcher.current_price(options[:url])}"
+    book = book_price_watcher.watch(options[:url], options[:price])
+    puts "#{ book.title } has been added."
+    puts "The current price is #{ book.current_price }"
     puts "The desired price has been set to #{ options[:price]}"
   ensure
     db.close
