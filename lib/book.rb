@@ -2,7 +2,8 @@ require_relative 'scraper'
 
 # Stores Amazon Kindle book details
 class Book
-  attr_accessor :desired_price, :url, :title, :price #need to get rid of title and price as they are defined twice...
+  attr_accessor :desired_price, :url
+  attr_writer :title, :price
 
   def initialize(url, desired_price, scraper = Scraper.new)
     @title = ''
