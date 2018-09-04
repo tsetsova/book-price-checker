@@ -3,10 +3,9 @@ require 'logger'
 
 # Database wrapper that sets up helper methods for insertion, deletion and quering the database
 class Database
-  def initialize(database_name = 'main.db', logger = Logger.new('logfile.log','weekly'))
+  def initialize(database_name = 'main.db', logger = Logger.new('logfile.log', 'weekly',level: :info))
     @db = SQLite3::Database.open(database_name)
     @logger = logger
-    @logger.level = Logger::INFO
   end
 
   def setup
@@ -26,14 +25,13 @@ class Database
   end
 
   def refresh
+    @logger.info('Refreshing state...')
     books.each do |book|
       new_price = book.latest_price
-      if book.price != new_price
-        update(book, new_price)
-      else
-        @logger.info('No changes. Everything is up to date.')
-      end
+      update(book, new_price) if book.price != new_price
     end
+
+    @logger.info('Everything is up to date.')
   end
 
   def update(book, new_price)
@@ -49,7 +47,7 @@ class Database
   def insert(book)
     begin
       @db.execute('INSERT INTO books(id, title, current_price, desired_price, url) VALUES(?,?,?,?,?);', [1, book.title, book.price, book.desired_price, book.url])
-      @logger.info("Addition: #{book.title} has been added succesfully.")
+      @logger.info("#{book.title} has been added succesfully.")
     rescue SQLite3::Exception => exception
       @logger.error("Exception #{exception} occurred")
    end
@@ -65,7 +63,7 @@ class Database
   def delete_title(title)
     begin
       @db.execute('DELETE FROM books WHERE title=?', [title])
-      @logger.info("Deletion: #{title} has been removed succesfully.")
+      @logger.info("#{title} has been removed succesfully.")
     rescue SQLite3::Exception => exception
       @logger.error("Exception #{exception} occurred")
    end

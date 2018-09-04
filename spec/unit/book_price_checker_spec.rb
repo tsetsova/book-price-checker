@@ -3,6 +3,7 @@ require_relative '../../db.rb'
 require 'fileutils'
 require 'faraday'
 require 'vcr'
+require 'logger'
 
 describe BookPriceChecker do
   before(:all) do
@@ -17,10 +18,11 @@ describe BookPriceChecker do
   end
 
   after(:each) do
+
     db.close
   end
 
-  let(:db) { Database.new(':memory:') }
+  let(:db) { Database.new(':memory:', Logger.new(STDERR, level: :error)) }
   let(:book_price_checker) { described_class.new(db) }
 
   it '#title' do
