@@ -32,6 +32,7 @@ class Database
         update(book, new_price)
       else
         @logger.info('No changes. Everything is up to date.')
+      end
     end
   end
 
@@ -64,7 +65,7 @@ class Database
   def delete_title(title)
     begin
       @db.execute('DELETE FROM books WHERE title=?', [title])
-      @logger.info("Deletion: #{book.title} has been removed succesfully.")
+      @logger.info("Deletion: #{title} has been removed succesfully.")
     rescue SQLite3::Exception => exception
       @logger.error("Exception #{exception} occurred")
    end
