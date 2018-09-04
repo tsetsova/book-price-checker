@@ -14,8 +14,8 @@ describe Book do
       book = Book.new(url, 1.99)
       book.scrape_details
 
-      expect(book.title).to eq "The Last Tudor"
-      expect(book.current_price).to eq(3.99)
+      expect(book.title).to eq 'The Last Tudor'
+      expect(book.price).to eq(3.99)
       expect(book.desired_price).to eq(1.99)
       expect(book.url).to eq(url)
     end

@@ -8,7 +8,7 @@ options = {}
 OptionParser.new do |parser|
   parser.banner = 'Usage: main.rb [options]'
 
-  parser.on('-h', '--help', 'Show this message') do ||
+  parser.on('-h', '--help', 'Show this message') do |list|
     puts parser
   end
 
@@ -20,8 +20,12 @@ OptionParser.new do |parser|
     options[:price] = price
   end
 
-  parser.on('-l', '--list', 'List the status of the currently saved books') do |list|
+  parser.on('-l', '--list', 'List the status of your saved books') do |list|
     options[:list] = list
+  end
+
+  parser.on('-r', '--refresh', 'Refresh the status of your saved books') do |refresh|
+    options[:refresh] = refresh
   end
 end.parse!
 
@@ -43,6 +47,13 @@ elsif (options[:list])
   db.setup
   book_price_watcher = BookPriceChecker.new(db)
 
+  puts book_price_watcher.watched_books.to_json
+elsif (options[:refresh])
+  db = Database.new
+  db.setup
+  book_price_watcher = BookPriceChecker.new(db)
+
+  book_price_watcher.refresh_books
   puts book_price_watcher.watched_books.to_json
 else
   puts "Please add a url AND a desired price. Use -h or --help for more information."

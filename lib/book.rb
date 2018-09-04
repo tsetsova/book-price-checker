@@ -1,54 +1,52 @@
-require 'faraday'
-require 'nokogiri'
+require_relative 'scraper'
 
 # Stores Amazon Kindle book details
 class Book
-  attr_accessor :title, :current_price, :desired_price, :url
+  attr_accessor :desired_price, :url, :title, :price #need to get rid of title and price as they are defined twice...
 
-  def initialize(url, desired_price)
+  def initialize(url, desired_price, scraper = Scraper.new)
     @title = ''
-    @current_price = 0
+    @price = 0
     @desired_price = desired_price
     @url = url
+    @scraper = scraper
   end
 
-  def self.from_db(_id, title, current_price, desired_price, url)
+  def self.from_db(_id, title, price, desired_price, url)
     book = new(url, desired_price)
     book.title = title
-    book.current_price = current_price
+    book.price = price
     book.desired_price = desired_price
     book
   end
 
+  def title
+    @title == '' ? @title = @scraper.scrape_title(@url) : @title
+  end
+
+  def price
+    @price.zero? ? @price = @scraper.scrape_price(@url) : @price
+  end
+
   def scrape_details
-    response_body = Faraday.get(@url).body
-    @title = scrape_for_title(response_body)
-    @current_price = scrape_for_price(response_body)
+    @title = @scraper.scrape_title(url)
+    @price = @scraper.scrape_price(url)
   end
 
   def cheap_enough?
-    @current_price <= @desired_price
+    @price <= @desired_price
+  end
+
+  def latest_price
+    @scraper.scrape_price(@url)
   end
 
   def to_map
     {
-      title: title, 
+      title: title,
       cheap?: cheap_enough?,
-      price: current_price,
+      price: price,
       desired_price: desired_price
     }
-  end
-
-  protected
-
-  def scrape_for_title(response_body)
-    html = Nokogiri::HTML(response_body)
-    html.at_css('span#ebooksProductTitle').text
-  end
-
-  def scrape_for_price(response_body)
-    selector = 'tr.kindle-price td.a-color-price'
-    html = Nokogiri::HTML(response_body)
-    /£(\d+\.\d+)/.match(html.at_css(selector).children[0].to_xml(encoding: "UTF-8").strip)[1].to_f
   end
 end

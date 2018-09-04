@@ -10,11 +10,11 @@ class BookPriceChecker
   end
 
   def current_price(url)
-    @books.find { |book| book.url == url }.current_price
+    @books.find { |book| book.url == url }.price
   end
 
   def watch(url, desired_price)
-    add_book(Book.new(url, desired_price))
+    @db.insert(Book.new(url, desired_price))
   end
 
   def unwatch(title)
@@ -25,13 +25,12 @@ class BookPriceChecker
     Hash[:books, load_books.map(&:to_map)]
   end
 
-  private
-
-  def add_book(book)
-    book.scrape_details
-    @db.insert(book)
-    book
+  def refresh_books
+    @db.refresh
+    load_books
   end
+
+  private
 
   def remove_book(title)
     @db.delete_title(title)
